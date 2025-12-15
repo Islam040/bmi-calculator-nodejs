@@ -1,0 +1,120 @@
+/* 1. Глобальные стили и типографика */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Современный, чистый шрифт */
+  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); /* Мягкий градиентный фон */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  color: #333;
+}
+
+/* 2. Стиль основного контейнера (карточки) */
+.container {
+  background: white;
+  padding: 40px;
+  border-radius: 16px; /* Более мягкие углы */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Видимая тень для эффекта "карточки" */
+  width: 320px;
+  max-width: 90%;
+  text-align: center;
+}
+
+h1 {
+  color: #2c3e50; /* Темный заголовок */
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+/* 3. Стиль формы и полей ввода */
+label {
+    display: block;
+    text-align: left;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+    font-size: 0.95em;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 0 0 20px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 8px; 
+  transition: border-color 0.3s;
+}
+
+input:focus {
+    border-color: #3498db; /* Голубая рамка при фокусе */
+    outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  background: #3498db; /* Яркая голубая кнопка */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.1s;
+}
+
+button:hover {
+  background: #2980b9;
+  transform: translateY(-1px); /* Эффект небольшого подъема при наведении */
+}
+
+/* 4. Стиль блока результата */
+.result-box {
+    margin: 25px 0;
+    padding: 25px;
+    border-radius: 12px;
+    font-weight: bold;
+    color: white;
+    font-size: 1.2em;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.result-box p {
+    margin: 8px 0;
+}
+
+/* 5. Цветовая кодировка BMI категорий (Профессиональные цвета) */
+.category-normal { 
+  background-color: #27ae60; /* Зеленый */
+}
+
+.category-underweight { 
+  background-color: #3498db; /* Голубой */
+}
+
+.category-overweight { 
+  background-color: #f39c12; /* Оранжевый */
+}
+
+.category-obese { 
+  background-color: #c0392b; /* Красный */
+}
+
+a {
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+  color: #3498db;
+  padding: 10px 20px;
+  border: 1px solid #3498db;
+  border-radius: 8px;
+  transition: background 0.3s, color 0.3s;
+}
+
+a:hover {
+  background: #3498db;
+  color: white;
+}

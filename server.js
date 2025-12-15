@@ -1,89 +1,87 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const path = require('path');
-const fs = require('fs');
+
+// server.js (строка 4 или 5)
 
 const app = express();
-const port = 3000;
+const port = 4000; // <--- ИЗМЕНИТЕ ЗДЕСЬ
 
-// Middleware для обработки данных формы (POST-запросы)
-app.use(bodyParser.urlencoded({ extended: true }));
+// Middleware для обработки данных формы (КРИТИЧЕСКИ ВАЖНО для POST)
+app.use(express.urlencoded({ extended: true }));
 
-// Middleware для обслуживания статических файлов (CSS)
-app.use(express.static(path.join(__dirname, ''))); 
+// Подключение статических файлов (CSS, HTML) из папки 'public'
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Загрузка HTML-шаблона один раз
-// Читаем файл index.html, чтобы потом вставлять в него результат
-const htmlTemplate = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
-
-// Функция для расчета и определения категории BMI
-function calculateBMI(weight, height) {
-    // Формула: BMI = weight (kg) / height² (m) [cite: 14]
-    const bmi = weight / (height * height); 
-    let category = '';
-    let categoryClass = '';
-
-    // Определяем категорию согласно требованиям задания [cite: 16, 17, 18, 19]
-    if (bmi < 18.5) {
-        category = 'Недостаточный вес'; // Underweight [cite: 16]
-        categoryClass = 'category-underweight';
-    } else if (bmi >= 18.5 && bmi < 24.9) {
-        category = 'Нормальный вес'; // Normal weight [cite: 17]
-        categoryClass = 'category-normal';
-    } else if (bmi >= 25 && bmi < 29.9) {
-        category = 'Избыточный вес'; // Overweight [cite: 18]
-        categoryClass = 'category-overweight';
-    } else { // BMI >= 30
-        category = 'Ожирение'; // Obese [cite: 19]
-        categoryClass = 'category-obese';
-    }
-
-    return {
-        bmi: bmi.toFixed(2), // Округляем до двух знаков после запятой
-        category: category,
-        categoryClass: categoryClass
-    };
-}
-
-// 1. Маршрут GET /: Отображает форму [cite: 11]
+// 1. Маршрут GET /: Отображение формы
 app.get('/', (req, res) => {
-    // При первой загрузке или GET-запросе, не показываем результат
-    const renderedHtml = htmlTemplate.replace('${resultPlaceholder}', ''); 
-    res.send(renderedHtml);
+    // Отправляем файл index.html из папки public
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// 2. Маршрут POST /calculate-bmi: Обрабатывает расчет BMI [cite: 12]
+// 2. Маршрут POST /calculate-bmi: Расчет и вывод результата
 app.post('/calculate-bmi', (req, res) => {
-    const weight = parseFloat(req.body.weight);
-    const height = parseFloat(req.body.height);
+    // Получение и преобразование данных в числа
+    const weight = parseFloat(req.body.weight); // Вес в кг
+    const height = parseFloat(req.body.height); // Рост в метрах
 
-    let resultHtml = '';
-
-    // Валидация: Проверяем, являются ли ввод положительными числами [cite: 24]
+    // Проверка ввода: должны быть числа и быть положительными
     if (isNaN(weight) || isNaN(height) || weight <= 0 || height <= 0) {
-        resultHtml = `
-            <div class="result-box category-obese">
-                Неверный ввод! Пожалуйста, введите положительные числа для веса и роста.
+        return res.status(400).send(`
+            <link rel="stylesheet" href="/styles.css">
+            <div class="container">
+                <h1>Ошибка ввода</h1>
+                <p>Пожалуйста, введите корректные положительные числа.</p>
+                <a href="/">Назад</a>
             </div>
-        `;
-    } else {
-        const bmiResult = calculateBMI(weight, height);
-
-        // Формируем HTML для отображения результата [cite: 22]
-        resultHtml = `
-            <div class="result-box ${bmiResult.categoryClass}">
-                <p>Ваш BMI: ${bmiResult.bmi}</p>
-                <p>Категория: ${bmiResult.category}</p>
-            </div>
-        `;
+        `);
     }
 
-    // Вставляем результат обратно в HTML-шаблон
-    const renderedHtml = htmlTemplate.replace('${resultPlaceholder}', resultHtml);
-    res.send(renderedHtml);
+    // Расчет BMI: BMI = weight (kg) / height² (m)
+    const bmi = (weight / (height * height)).toFixed(2);
+
+    let category = '';
+    let className = '';
+
+    // Определение категории и соответствующего CSS-класса
+    if (bmi < 18.5) {
+        category = 'Недостаточный вес (Underweight)';
+        className = 'category-underweight';
+    } else if (bmi < 24.9) {
+        category = 'Нормальный вес (Normal weight)';
+        className = 'category-normal';
+    } else if (bmi < 29.9) {
+        category = 'Избыточный вес (Overweight)';
+        className = 'category-overweight';
+    } else {
+        category = 'Ожирение (Obese)';
+        className = 'category-obese';
+    }
+
+    // Возвращаем результат в HTML
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="ru">
+        <head>
+            <meta charset="UTF-8">
+            <title>BMI Результат</title>
+            <link rel="stylesheet" href="/styles.css">
+        </head>
+        <body>
+            <div class="container">
+                <h1>Ваш результат BMI</h1>
+                <div class="result-box ${className}">
+                    <p><strong>BMI:</strong> ${bmi}</p>
+                    <p><strong>Категория:</strong> ${category}</p>
+                </div>
+                <br>
+                <a href="/">Рассчитать снова</a>
+            </div>
+        </body>
+        </html>
+    `);
 });
 
-// Запуск сервера [cite: 9]
+// Запуск сервера
 app.listen(port, () => {
-    console.log(`Сервер запущен на http://localhost:${port}`);
+    console.log(`Сервер запущен: http://localhost:${port}`);
 });
